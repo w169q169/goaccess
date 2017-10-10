@@ -1525,6 +1525,106 @@ strip_qstring (char *req)
   }
 }
 
+/* get filter string  */
+static char* 
+get_filter_str(char *req, const char *filter) {
+    char *start = NULL;
+    char *end = NULL;
+    char *deli = "&";
+
+    size_t flen;
+    flen = strlen(filter);
+
+    char *filterP = malloc(flen + 2);
+
+    strncpy(filterP, filter, flen);
+    filterP[flen] = '=';
+    filterP[flen + 1] = '\0';
+
+    start = strstr(req, filterP);
+
+    filterP = NULL;
+    free(filterP);
+
+    if (start == NULL) {
+        return NULL;
+    }
+
+    int len = 0;
+
+    end = strstr(start,deli); 
+
+    if (end == NULL) {
+        
+        end = start;
+
+        while (*end != '\0') {
+            end++;
+        }
+    }
+
+    len = end - start;
+    
+    if (len == 0) {
+        return NULL;
+    }
+
+
+    char *dest = malloc(len + 1);
+
+    strncpy(dest, start, len);
+    dest[len] = '\0';
+    return dest;
+}
+
+/* filter url query string, e.g...
+ * /index.php?timestamp=1454385289 */
+static void
+strip_filter_str (char *req)
+{
+
+    char *qmark;
+
+    if ((qmark = strchr(req, '?')) == NULL) {
+        return;
+    }
+
+    if ((qmark - req) == 0) {
+        return;
+    }
+
+
+    char dest[1024] = "";
+    char *result;
+    result = NULL;
+    for (int i = 0; i < conf.filter_params_idx; i++) {
+
+        result = get_filter_str(req, conf.filter_params[i]);
+        if (result == NULL) {
+            return;
+        }
+
+        if (i != 0) {
+            strcat(dest, "&");
+        }
+
+        strcat(dest, result);
+
+        result = NULL;
+        free(result);
+    }
+
+    char *p = dest;
+    qmark++;
+    while (*p != '\0') {
+        *qmark = *p;
+        qmark++;
+        p++;
+    }
+
+    *qmark = '\0';
+}
+
 /* Increment the overall bandwidth. */
 static void
 inc_resp_size (GLog * glog, uint64_t resp_size)
@@ -1724,6 +1824,9 @@ ignore_line (GLog * glog, GLogItem * logitem)
   /* check if we need to remove the request's query string */
   if (conf.ignore_qstr)
     strip_qstring (logitem->req);
+
+  if (conf.ignore_qstr == 0 && conf.filter_params_idx > 0) 
+    strip_filter_str(logitem->req);
 
   return 0;
 }

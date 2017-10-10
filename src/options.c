@@ -107,6 +107,7 @@ struct option long_opts[] = {
   {"ignore-panel"         , required_argument , 0 ,  0  } ,
   {"ignore-referer"       , required_argument , 0 ,  0  } ,
   {"ignore-status"        , required_argument , 0 ,  0  } ,
+  {"filter-params"        , required_argument , 0 ,  0  } ,
   {"invalid-requests"     , required_argument , 0 ,  0  } ,
   {"json-pretty-print"    , no_argument       , 0 ,  0  } ,
   {"log-format"           , required_argument , 0 ,  0  } ,
@@ -239,6 +240,7 @@ cmd_help (void)
   "  -q --no-query-string            - Ignore request's query string. Removing the\n"
   "                                    query string can greatly decrease memory\n"
   "                                    consumption.\n"
+  "  --filter-params=<param>        - filter query string params.\n"
   "  -r --no-term-resolver           - Disable IP resolver on terminal output.\n"
   "  --444-as-404                    - Treat non-standard status code 444 as 404.\n"
   "  --4xx-to-unique-count           - Add 4xx client errors to the unique visitors\n"
@@ -556,6 +558,12 @@ parse_long_opt (const char *name, const char *oarg)
   if (!strcmp ("ignore-status", name))
     set_array_opt (oarg, conf.ignore_status, &conf.ignore_status_idx,
                    MAX_IGNORE_STATUS);
+
+  
+  /* filter-params */
+  if (!strcmp ("filter-params", name))
+    set_array_opt (oarg, conf.filter_params, &conf.filter_params_idx,
+                   MAX_FILTER_PARAMS);
 
   /* number of line tests */
   if (!strcmp ("num-tests", name)) {

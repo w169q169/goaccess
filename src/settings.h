@@ -41,6 +41,7 @@
 #define MAX_IGNORE_STATUS      64
 #define MAX_OUTFORMATS          3
 #define MAX_FILENAMES         512
+#define MAX_FILTER_PARAMS         10
 #define NO_CONFIG_FILE "No config file used"
 
 typedef enum LOGTYPE
@@ -105,6 +106,8 @@ typedef struct GConf_
   const char *output_formats[MAX_OUTFORMATS];   /* output format, e.g. , HTML */
   const char *sort_panels[TOTAL_MODULES];       /* sorting options for each panel */
   const char *static_files[MAX_EXTENSIONS];     /* static extensions */
+  const char *filter_params[MAX_FILTER_PARAMS];     /* filter params */
+
 
   /* Log/date/time formats */
   char *date_format;                /* date format */
@@ -194,6 +197,7 @@ typedef struct GConf_
   int output_format_idx;            /* output format index */
   int sort_panel_idx;               /* sort panel index */
   int static_file_idx;              /* static extensions index */
+  int filter_params_idx;              /* filter params index */
 
   size_t static_file_max_len;
 
